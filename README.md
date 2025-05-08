@@ -10,7 +10,9 @@ as such, for educational purposes.
 
 ## Usage
 
-- Download and unpack this extension
+- Download this repository
+- Install the Node.js dependencies (e.g, with `npm install`)
+- Unpack this extension
 - Optionally, pin the extension to the toolbar
 - Go to an HTTP/HTTPS web page, such as [`example.com`](https://example.com)
 - Click on the extension icon from the extension toolbar
