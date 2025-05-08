@@ -1,0 +1,11 @@
+{
+    "name": "unsafe_test",
+    "version": "1.0.0",
+    "manifest_version": 3,
+    "permissions": ["debugger", "scripting"],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {},
+    "host_permissions": ["<all_urls>"]
+}
