@@ -33,7 +33,8 @@ so I implore you to not trust me and view the source yourself.
 This extension is highly capable, with some limitations:
 
 - Running `eval` in web pages where its CSP restricts or prevents it entirely.
-  This isn't possible in extension pages.
+  This isn't possible in extension pages, as per the
+  [`extension pages policy`](https://developer.chrome.com/docs/extensions/reference/manifest/content-security-policy#extension_pages_policy).
 - Using extension APIs in extension pages.
 
 Try modifying the stringified script, test its capabilities for yourself.
@@ -42,6 +43,7 @@ Try modifying the stringified script, test its capabilities for yourself.
 
 This project showed I can take an idea- one that might not even be possible-
 and make it into reality. This required reading the Chromium API docs and
-the DevTools protocol docs to find a way to execute this idea.
+the DevTools protocol docs to find a way to execute this idea,
+followed by coming up with interesting ways to test its capabilities.
 Needless to say, this was just a fun project to work on.
 **So please don't be funny and use it in production**.
