@@ -1,9 +1,9 @@
-import { type RemoteObject, type ExceptionDetails } from './debugger.d.ts';
+import { Protocol } from 'devtools-protocol';
 
 export interface ExecutionResult {
     /** Evaluation result. */
-    result: RemoteObject;
+    result: Protocol.Runtime.RemoteObject;
 
     /** Exception details. */
-    exceptionDetails?: ExceptionDetails;
+    exceptionDetails?: Protocol.Runtime.ExceptionDetails;
 }

@@ -8,9 +8,9 @@
  */
 async function execute(target, script) {
     const DEBUGGER_VERSION = '1.3';
-    
+
     await chrome.debugger.attach(target, DEBUGGER_VERSION);
-    
+
     const RESULT = /** @type ExecutionResult */ (await chrome.debugger.sendCommand(
         target,
         'Runtime.evaluate',
@@ -31,7 +31,7 @@ async function execute(target, script) {
 const TEST_SCRIPT = `
     console.log('Logged!');
     alert('Alerted!');
-    
+
     // This is the last statement, so its value will be returned
     new Promise(
         (resolve) => {
@@ -51,20 +51,20 @@ const TEST_SCRIPT = `
 // Initializing extension functionality
 chrome.action.onClicked.addListener((tab) => {
     const TAB_ID = tab.id;
-    
+
     console.log(`Checking... (Is ${TAB_ID} nullish?)`);
-    
+
     if (TAB_ID != null) {
         const TARGET = { tabId: TAB_ID };
-        
+
         console.log(`Running test script:\n${TEST_SCRIPT}`);
-        
+
         execute(TARGET, TEST_SCRIPT).then((response) => {
-            if (response.exceptionDetails != null) {
-                console.error('Caught exception:', response.exceptionDetails);
+            if (response.exceptionDetails == null) {
+                console.log(response.result.type, `result:`, response.result.value);
             }
             else {
-                console.log(response.result.type, `result:`, response.result.value);
+                console.error('Caught exception:', response.exceptionDetails);
             }
 
             console.log('Full response details:', response);

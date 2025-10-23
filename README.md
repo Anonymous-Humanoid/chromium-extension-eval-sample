@@ -21,29 +21,19 @@ as such, for educational purposes.
 
 ## This is scary, what's it gonna do?
 
-Nothing. In short, it prints out 4 strings using 4 different methods. Under
-the hood, it attaches a debugger and runs a stringified test script that messes
-with `console.log`, `alert`, `Promise` and `eval`. The functional part of the
-extension is in [`background.js`](./background.js), so I implore you to not
-trust me and view the source yourself.
-
-More importantly, this doesn't actually allow arbitrary code execution
-within a web page. The debugger API is only accessible from within the
-extension itself, so even if the debugger is required to be attached to a
-source, such as a web page- as is the case in this sample- this does not
-override the extension's content security policy (CSP).
-
-This sample shows that arbitrary code execution is possible within the
-extension context, but not inside the website sandbox. You'll notice a
-warning report in the website's developer console, complaining that `eval`
-violates the CSP, and moving right along. And yet you'll see the result
-of that `eval` call in the service worker console. Magic.
+Nothing. Yes, the `debugger` permission gives it access to do *a lot*,
+but this demo only makes use of one of its many powerful APIs.
+In short, it prints out 4 strings using 4 different methods. Under
+the hood, it attaches a debugger and evaluates a stringified test script
+that uses `console.log`, `alert`, `Promise` and `eval`. The functional part
+of the extension is in [`background.js`](./background.js),
+so I implore you to not trust me and view the source yourself.
+Try modifying the stringified script, even.
 
 ## Why do this?
 
 This project showed I can take an idea- one that might not even be possible-
 and make it into reality. This required reading the Chromium API docs and
-translating the DevTools protocol docs. And then realizing that the latter has
-[already been done](https://github.com/ChromeDevTools/devtools-protocol/blob/master/types/protocol.d.ts).
+the DevTools protocol docs to find a way to execute this idea.
 Needless to say, this was just a fun project to work on.
 **So please don't be funny and use it in production**.
