@@ -5,6 +5,10 @@
     "type": "commonjs",
     "license": "MIT",
     "private": true,
+    "repository": {
+        "url": "git+https://github.com/Anonymous-Humanoid/chromium-extension-eval-sample.git",
+        "type": "git"
+    },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
