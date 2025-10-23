@@ -11,7 +11,7 @@ async function execute(target, script) {
 
     await chrome.debugger.attach(target, DEBUGGER_VERSION);
 
-    const RESULT = /** @type ExecutionResult */ (await chrome.debugger.sendCommand(
+    let result = /** @type ExecutionResult */ (await chrome.debugger.sendCommand(
         target,
         'Runtime.evaluate',
         {
@@ -25,41 +25,77 @@ async function execute(target, script) {
 
     await chrome.debugger.detach(target);
 
-    return RESULT;
+    return result;
 }
 
-const TEST_SCRIPT = `
-    console.log('Logged!');
-    alert('Alerted!');
+const testScript = `// Test script
+'use-strict';
 
-    // This is the last statement, so its value will be returned
-    new Promise(
-        (resolve) => {
-            setTimeout(
-                () => {
-                    const OUTPUT = eval('(() => "Evaluated!")()');
-                    
-                    console.log('Waited!');
-                    resolve(OUTPUT);
-                },
-                1000
-            );
-        }
-    );
+// Global variable (works with var/let/const)
+var globalVar = 'Excelsior!';
+
+const inExtension = chrome.runtime?.getURL != null;
+
+if (inExtension) {
+    console.log('Used extension API:', chrome.runtime.getURL('manifest.json'));
+}
+else {
+    // Can't access extension APIs in web pages
+    console.log("Couldn't use extension APIs");
+}
+
+// This is the last statement, so its value will be returned
+new Promise(
+    (resolve) => {
+        setTimeout(
+            () => {
+                const output = inExtension
+                    ? (() => "Couldn't use eval")()
+                    : eval('(() => "Evaluated!")()');
+
+                console.log('Ran asynchronously!');
+                resolve(output);
+            },
+            1000
+        );
+    }
+);
 `;
 
-// Initializing extension functionality
-chrome.action.onClicked.addListener((tab) => {
-    const TAB_ID = tab.id;
+/**
+ * Asserts that the test script ran in the main world by checking
+ * that a variable it created in the global scope exists
+ */
+function globalScopeTest() {
+    console.log(
+        `Are script variables defined in the global scope?`,
+        // @ts-expect-error Variable is defined in the test script
+        typeof globalVar === 'undefined'
+            ? "No, variable missing from global scope"
+            : "Yes, test script ran in the main world"
+    );
+}
 
-    console.log(`Checking... (Is ${TAB_ID} nullish?)`);
+// Initializing extension popup
+chrome.action.onClicked.addListener(async (tab) => {
+    const availTargets = await chrome.debugger.getTargets();
+    const extTarget = availTargets.find((info) =>
+        info.url === chrome.runtime.getURL('background.js'));
 
-    if (TAB_ID != null) {
-        const TARGET = { tabId: TAB_ID };
+    // Only attaching if we can attach to the tab AND the extension SW
+    if (tab.id != null && extTarget?.id != null) {
+        const targets = /** @type [string, chrome.debugger.Debuggee][] */ ([
+            ['tab', { tabId: tab.id }],
+            ['extension', { targetId: extTarget.id }]
+        ]);
 
-        console.log(`Running test script:\n${TEST_SCRIPT}`);
+        console.log(testScript);
 
-        execute(TARGET, TEST_SCRIPT).then((response) => {
+        for (const [type, target] of targets) {
+            console.log(`Running in ${type}...`);
+
+            const response = await execute(target, testScript);
+
             if (response.exceptionDetails == null) {
                 console.log(response.result.type, `result:`, response.result.value);
             }
@@ -67,7 +103,16 @@ chrome.action.onClicked.addListener((tab) => {
                 console.error('Caught exception:', response.exceptionDetails);
             }
 
-            console.log('Full response details:', response);
+            console.debug('Full response details:', response);
+            console.log('Done!');
+        }
+
+        chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: globalScopeTest,
+            world: 'MAIN'
         });
+
+        globalScopeTest();
     }
 });

@@ -16,6 +16,7 @@ as such, for educational purposes.
 - Optionally, pin the extension to the toolbar
 - Go to an HTTP/HTTPS web page, such as [`example.com`](https://example.com)
 - Click on the extension icon from the extension toolbar
+- A script will be run in that page, followed by the extension's service worker
 - The output will be displayed across the website's developer console
   and the extension's service worker console.
 
@@ -23,12 +24,19 @@ as such, for educational purposes.
 
 Nothing. Yes, the `debugger` permission gives it access to do *a lot*,
 but this demo only makes use of one of its many powerful APIs.
-In short, it prints out 4 strings using 4 different methods. Under
+In short, it prints out numerous strings using different methods. Under
 the hood, it attaches a debugger and evaluates a stringified test script
-that uses `console.log`, `alert`, `Promise` and `eval`. The functional part
-of the extension is in [`background.js`](./background.js),
+that uses `console.log`, `Promise` and `eval`, among other tests.
+The functional part of the extension is in [`background.js`](./background.js),
 so I implore you to not trust me and view the source yourself.
-Try modifying the stringified script, even.
+
+This extension is highly capable, with some limitations:
+
+- Running `eval` in web pages where its CSP restricts or prevents it entirely.
+  This isn't possible in extension pages.
+- Using extension APIs in extension pages.
+
+Try modifying the stringified script, test its capabilities for yourself.
 
 ## Why do this?
 
